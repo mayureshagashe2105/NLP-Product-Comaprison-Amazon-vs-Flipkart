@@ -63,10 +63,26 @@ while True:
                     isprime = False
                 url = name.find('a')['href']
                 url = 'https://www.amazon.in' + url
+                usable_url = url.split('?')[0]
 
-                print(f'{i}.Name: {name.text}\n   Price: {price.text}')
-                print(f'   Amazon Prime Delivered Status: {isprime}')
-                print(f'   {url}')
+                while True:
+                    try:
+                        r1 = urllib.request.urlopen(usable_url)
+                        product_page1 = r1.read()
+                        soup1 = BeautifulSoup(product_page1, 'lxml')
+
+                        body1 = soup1.find('body')
+                        dp = body1.find('div', id='ppd')
+                        features = dp.find('div', id='featurebullets_feature_div')
+                        features = features.text.replace('\n\n', '\n')
+                        break
+                    except urllib.error.HTTPError:
+                        continue
+
+                print(f'{i}.Name: {name.text}\nPrice: {price.text}')
+                print(f'Amazon Prime Delivered Status: {isprime}')
+                print(f'Description: {features}')
+                print(f'URL: {url}')
                 print('--------------------------------------')
                 i += 1
                 Name.append(name.text[:10])
