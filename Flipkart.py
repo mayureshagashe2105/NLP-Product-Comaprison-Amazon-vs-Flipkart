@@ -14,7 +14,7 @@ def SearchStringCompatibility():
     return KEYWORD
 
 
-KEYWORD = 'bags' #SearchStringCompatibility()
+KEYWORD = SearchStringCompatibility()
 
 r = urllib.request.urlopen(f"https://www.flipkart.com/search?q={KEYWORD}")
 product_page = r.read()
