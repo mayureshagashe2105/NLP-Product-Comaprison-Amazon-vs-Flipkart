@@ -24,7 +24,7 @@ mycursor = db.cursor()
 Q2 = 'SELECT * FROM product'
 Q3 = 'DELETE FROM product'
 
-mycursor.execute(Q3)
+#mycursor.execute(Q3)
 
 
 def SearchStringCompatibility():

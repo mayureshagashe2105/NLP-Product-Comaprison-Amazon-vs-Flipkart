@@ -3,6 +3,19 @@ import time
 import urllib.request
 import urllib.error
 import urllib
+import mysql.connector
+
+db = mysql.connector.connect(
+    host='localhost',
+    user='root',
+    passwd='Mihirmayuresh123!',
+    database='scrapped_db'
+)
+
+mycursor = db.cursor(buffered=True)
+
+Q2 = 'SELECT * FROM product'
+
 
 def SearchStringCompatibility():
     KEYWORD = input('Enter a product name ')
@@ -23,30 +36,31 @@ body = soup.find('body')
 roi = body.find('div', class_='_1YokD2 _3Mn1Gg', style='flex-grow:1;overflow:auto')
 divs = roi.find_all('div', class_='_1AtVbE col-12-12')
 i = 0
-for div in divs:
+for div in divs[:10]:
     subdiv = div.find('div', class_='_4rR01T')
     if subdiv is None:
         aas = div.find_all('a')
         for a in aas:
+            price = 0
+            url = ''
             Name = a.text
             if Name == '' or Name == '1':
                 if i != 0:
-                    '''usable_url = f'https://www.flipkart.com{a["href"].split("?")[0]}'
-                    r1 = urllib.request.urlopen(usable_url)
-                    product_page1 = r1.read()
-                    soup1 = BeautifulSoup(product_page1, 'lxml')
-                    body1 = soup1.find('div', class_='_1YokD2 _3Mn1Gg')
-                    print(body1.text)
-                    exit(55)'''
+                    url = f'https://www.flipkart.com{a["href"]}'.split('?')[0]
                     print(f'https://www.flipkart.com{a["href"]}')
                 print("------------------------------")
                 i += 1
                 print(f'{i}. ', end='')
             else:
                 if '₹' in Name:
-                    Name = Name.split('₹')[1]
-                    print('Price: ₹', end='')
-                print(f'{Name}')
+                    price = Name.split('₹')[1]
+                    print(f'Price: ₹{price}')
+                else:
+                    print(f'{Name}')
+            mycursor.execute('INSERT INTO product(name, price, isprime, url) VALUES (%s, %s, %s, %s)',
+                             (Name, price, 'NA', url))
+            db.commit()
+
     else:
         Name = subdiv.text
         Des = div.find('div', class_='fMghEO')
@@ -60,3 +74,11 @@ for div in divs:
         print(f'URL : {url}')
         print('------------------------------------------')
         i += 1
+        mycursor.execute('INSERT INTO product(name, price, isprime, url) VALUES (%s, %s, %s, %s)',
+                         (Name, Price.text, 'NA', url.split('?')[0]))
+        db.commit()
+
+
+mycursor.execute(Q2)
+for x in mycursor:
+    print(x)
