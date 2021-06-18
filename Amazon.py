@@ -3,7 +3,29 @@ import time
 import urllib.request
 import urllib.error
 import urllib
-import pandas as pd
+import mysql.connector
+
+db = mysql.connector.connect(
+    host='localhost',
+    user='root',
+    passwd='Mihirmayuresh123!',
+    database='scrapped_db'
+)
+
+
+mycursor = db.cursor()
+'''mycursor.execute('CREATE TABLE product(id int PRIMARY KEY AUTO_INCREMENT ,'
+                 'name text, '
+                 'price VARCHAR(10), isprime VARCHAR(2), '
+                 'url text)')'''
+
+# mycursor.execute('DROP TABLE product')
+
+Q2 = 'SELECT * FROM product'
+Q3 = 'DELETE FROM product'
+
+mycursor.execute(Q3)
+
 
 def SearchStringCompatibility():
     KEYWORD = input('Enter a product name ')
@@ -18,7 +40,6 @@ def SearchStringCompatibility():
 KEYWORD = SearchStringCompatibility()
 
 while True:
-    Name, Price, Is_Prime, URL = [], [], [], []
     try:
         r = urllib.request.urlopen(f"https://www.amazon.in/s?k={KEYWORD}&ref=nb_sb_noss_2")
         product_page = r.read()
@@ -48,7 +69,7 @@ while True:
                                         class_='s-result-item s-asin sg-col-0-of-12 sg-col-16-of-20 sg-col '
                                                'sg-col-12-of-16')
             Flag = False
-        for item in items:
+        for item in items:  # picking all the items
             try:
                 if Flag:
                     name = item.find('div', class_='a-section a-spacing-none a-spacing-top-small')
@@ -59,13 +80,15 @@ while True:
                 try:
                     isprime = item.find('span', class_='aok-relative s-icon-text-medium s-prime')
                     isprime = isprime.find('i')['aria-label']
+                    db_isprime = 'Y'
                 except KeyError:
                     isprime = False
+                    db_isprime = 'N'
                 url = name.find('a')['href']
                 url = 'https://www.amazon.in' + url
-                usable_url = url.split('?')[0]
-
+                usable_url = url.split('?')[0]  # taking only "GET" url
                 while True:
+                    '''For description'''
                     try:
                         r1 = urllib.request.urlopen(usable_url)
                         product_page1 = r1.read()
@@ -83,20 +106,21 @@ while True:
                 print(f'Amazon Prime Delivered Status: {isprime}')
                 print(f'Description: {features}')
                 print(f'URL: {url}')
-                print('--------------------------------------')
+                print('-----------------------------------------------------------------------------------------------')
                 i += 1
-                Name.append(name.text[:10])
-                Price.append(price.text)
-                Is_Prime.append(isprime)
-                URL.append(url)
-
-            except:
+                if i == 6:
+                    print('hallo')
+                mycursor.execute('INSERT INTO product(name, price, isprime, url) VALUES (%s, %s, %s, %s)',
+                                    (name.text, price.text.split('₹')[1], db_isprime, usable_url))
+                db.commit()
+            except Exception as e:
+                print(type(e))
                 continue
 
-        data = pd.DataFrame({'Name': Name, 'Price': Price, 'IS_Prime': Is_Prime, 'URL': URL})
-        data = data.set_index('Name')
-        print(data.head())
-        print('Waiting for 3 mins to refresh the page././././')
+        mycursor.execute(Q2)
+        for x in mycursor:
+            print(x)
+        print('\nWaiting for 3 mins to refresh the page././././')
         time.sleep(3 * 60)
 
     except KeyboardInterrupt:
