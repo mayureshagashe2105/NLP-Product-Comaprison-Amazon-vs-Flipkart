@@ -36,30 +36,33 @@ body = soup.find('body')
 roi = body.find('div', class_='_1YokD2 _3Mn1Gg', style='flex-grow:1;overflow:auto')
 divs = roi.find_all('div', class_='_1AtVbE col-12-12')
 i = 0
+price, url, Name1 = '', '', ''
 for div in divs[:10]:
     subdiv = div.find('div', class_='_4rR01T')
     if subdiv is None:
         aas = div.find_all('a')
         for a in aas:
-            price = 0
-            url = ''
             Name = a.text
             if Name == '' or Name == '1':
-                if i != 0:
-                    url = f'https://www.flipkart.com{a["href"]}'.split('?')[0]
-                    print(f'https://www.flipkart.com{a["href"]}')
-                print("------------------------------")
-                i += 1
-                print(f'{i}. ', end='')
+                url = f'https://www.flipkart.com{a["href"]}'.split('?')[0]
+                display = f'https://www.flipkart.com{a["href"]}'
+
             else:
                 if '₹' in Name:
                     price = Name.split('₹')[1]
                     print(f'Price: ₹{price}')
+                    print(f'URL: {display}')
+                    print("------------------------------")
+                    i += 1
+                    print(f'{i}. ', end='')
+                    temp = (Name1, price, 'NA', url)
+                    mycursor.execute('INSERT INTO product(name, price, isprime, url) VALUES (%s, %s, %s, %s)', temp)
+                    db.commit()
                 else:
+                    Name1 = Name
+
                     print(f'{Name}')
-            mycursor.execute('INSERT INTO product(name, price, isprime, url) VALUES (%s, %s, %s, %s)',
-                             (Name, price, 'NA', url))
-            db.commit()
+
 
     else:
         Name = subdiv.text
@@ -74,11 +77,5 @@ for div in divs[:10]:
         print(f'URL : {url}')
         print('------------------------------------------')
         i += 1
-        mycursor.execute('INSERT INTO product(name, price, isprime, url) VALUES (%s, %s, %s, %s)',
-                         (Name, Price.text, 'NA', url.split('?')[0]))
+        mycursor.execute('INSERT INTO product(name, price, isprime, url) VALUES (%s, %s, %s, %s)',values)
         db.commit()
-
-
-mycursor.execute(Q2)
-for x in mycursor:
-    print(x)
