@@ -10,20 +10,23 @@ db = mysql.connector.connect(
 mycursor = db.cursor(buffered=True)
 
 
-def getamazon():
-    Q2 = 'SELECT * FROM product WHERE isprime != "NA"'
+def getamazon(shape):
+    Q2 = 'SELECT name FROM product WHERE isprime != "NA"'
     mycursor.execute(Q2)
+    counter = 0
     for x in mycursor:
-        yield x
+        if counter == shape:
+            break
+        yield x[0]
+        counter += 1
 
-def getflipkart():
-    Q2 = 'SELECT * FROM product WHERE isprime = "NA"'
+
+def getflipkart(shape):
+    Q2 = 'SELECT name FROM product WHERE isprime = "NA"'
     mycursor.execute(Q2)
+    counter = 0
     for y in mycursor:
-        print(y)
-        yield y
-
-mycursor.execute('SELECT * FROM product')
-for i in mycursor:
-    print(i)
-
+        if counter == shape:
+            break
+        yield y[0]
+        counter += 1
