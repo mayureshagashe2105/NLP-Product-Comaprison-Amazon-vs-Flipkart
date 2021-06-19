@@ -13,7 +13,7 @@ class TextFormatting:
             for i in omit:
                 stop_words.remove(i)
 
-        print(f'Removing following stop words: {stop_words}')
+        #print(f'Removing following stop words: {stop_words}')
         words = self.text.split(" ")
         doc1 = ""
         for i in words:
@@ -21,8 +21,9 @@ class TextFormatting:
                 doc1 = doc1 + " " + i
 
         self.text = doc1
+        self.TextTruncate()
 
-    def RemoveTagsAndPunctuation(self, punctuation=None, omit=None):
+    def RemoveTagsAndPunctuations(self, punctuation=None, omit=None):
         punctuations = r'''!()-[]{};:'"\,<>./?@#$%^&*_~'''
         if punctuation is not None:
             for i in punctuation:
@@ -30,15 +31,15 @@ class TextFormatting:
 
         if omit is not None:
             for i in omit:
-                punctuations.replace(i, "")
+                punctuations = punctuations.replace(i, "")
 
-        print(f'Removing following Punctuations: {punctuations}')
+        #print(f'Removing following Punctuations: {punctuations}')
         for i in self.text:
             if i in punctuations:
-                self.text.replace(i, "")
+                self.text = self.text.replace(i, "")
 
     def ToLower(self):
-        self.text.lower()
+        self.text = self.text.lower()
 
     def CreateUniqueid(self):
         self.ToLower()
@@ -51,6 +52,6 @@ class TextFormatting:
     def TextTruncate(self):
         for i in self.text:
             if i == " ":
-                self.text.replace(i, "", 1)
+                self.text = self.text.replace(i, "", 1)
             else:
                 break
