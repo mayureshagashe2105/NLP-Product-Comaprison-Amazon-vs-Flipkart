@@ -18,15 +18,15 @@ def distance_calc(shape):
     dist_matrix = np.zeros((shape, shape))
     i = 0
     try:
-        for j in amazon:
-            words1 = textformat(j)
+        for amazon_product in amazon:
+            words1 = textformat(amazon_product)
             words1 = words1.split(" ")
             len1 = len(words1)
             flipkart = MySQL_DB.getflipkart(shape)
             temp_score = []
-            for k in flipkart:
+            for flipkart_product in flipkart:
                 counter = 0
-                words2 = textformat(k)
+                words2 = textformat(flipkart_product)
                 words2 = words2.split(" ")
                 len2 = len(words2)
                 for word in words2:
@@ -41,10 +41,33 @@ def distance_calc(shape):
 
             dist_matrix[i] = temp_score
             i += 1
-        return dist_matrix
-    except ValueError:
+    except Exception as e:
+        print(e)
         print(f'{shape} record(s) are not available to compare')
 
+    return dist_matrix
 
-matrix = distance_calc(shape=5)
-print(matrix)
+
+SHAPE = 40
+matrix = distance_calc(SHAPE)
+
+sl = np.argwhere(matrix[:, :] > 0.5)
+product_id = sl[:, 0]
+try1 = np.unique(product_id)
+max_dict = dict.fromkeys(product_id, [0.49, None])
+sl = sl.tolist()
+
+for indices in sl:
+    val = matrix[indices[0], indices[1]]
+    if max_dict[indices[0]][0] < val:
+        max_dict[indices[0]] = [val, indices[1]]
+
+pairs = np.ones((len(try1), 2)).astype('int32')
+i = 0
+for key, val in max_dict.items():
+    pairs[i] = [key, val[1]]
+    i += 1
+
+MySQL_DB.retrivedata(pairs)
+
+
