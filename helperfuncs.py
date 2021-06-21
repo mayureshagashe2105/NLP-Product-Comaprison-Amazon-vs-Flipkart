@@ -1,5 +1,5 @@
 class TextFormatting:
-    def __init__(self, text):
+    def __init__(self, text=""):
         self.text = text
         self.unique_dict = {}
 
@@ -55,3 +55,11 @@ class TextFormatting:
                 self.text = self.text.replace(i, "", 1)
             else:
                 break
+
+    def SearchStringCompatibility(self, KEYWORD):
+        search_words = KEYWORD.split()
+        search_string = ""
+        for i in range(len(search_words)):
+            search_string += search_words[i] + '+'
+        KEYWORD = search_string[:-1]
+        return KEYWORD

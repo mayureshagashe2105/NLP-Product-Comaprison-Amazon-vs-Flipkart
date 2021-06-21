@@ -1,8 +1,18 @@
 import numpy as np
 import helperfuncs
 import MySQL_DB
+import Amazon
+import Flipkart
 
 PLACEHOLDER = '!!!'
+
+
+def GetData(KEYWORD, include_features=False):
+    Amazon.ScrappingAmazon(KEYWORD, include_features=include_features)
+    Flipkart.ScrappingFlipkart(KEYWORD)
+    print(f'\nShowing results for {KEYWORD}:')
+
+
 
 def textformat(text):
     formatter = helperfuncs.TextFormatting(text)
@@ -48,26 +58,25 @@ def distance_calc(shape):
     return dist_matrix
 
 
-SHAPE = 40
-matrix = distance_calc(SHAPE)
+def compare(matrix, confidence_score=0.5, omit=False):
+    print('')
+    sl = np.argwhere(matrix[:, :] > confidence_score)
+    product_id = sl[:, 0]
+    try1 = np.unique(product_id)
+    max_dict = dict.fromkeys(product_id, [0.49, None])
+    con_dict = dict.fromkeys(product_id, [])
+    sl = sl.tolist()
 
-sl = np.argwhere(matrix[:, :] > 0.5)
-product_id = sl[:, 0]
-try1 = np.unique(product_id)
-max_dict = dict.fromkeys(product_id, [0.49, None])
-sl = sl.tolist()
+    for indices in sl:
+        val = matrix[indices[0], indices[1]]
+        if max_dict[indices[0]][0] < val:
+            max_dict[indices[0]] = [val, indices[1]]
 
-for indices in sl:
-    val = matrix[indices[0], indices[1]]
-    if max_dict[indices[0]][0] < val:
-        max_dict[indices[0]] = [val, indices[1]]
+    pairs = np.ones((len(try1), 2)).astype('int32')
+    i = 0
+    for key, val in max_dict.items():
+        pairs[i] = [key, val[1]]
+        i += 1
 
-pairs = np.ones((len(try1), 2)).astype('int32')
-i = 0
-for key, val in max_dict.items():
-    pairs[i] = [key, val[1]]
-    i += 1
-
-MySQL_DB.retrivedata(pairs)
-
-
+    MySQL_DB.retrivedata(pairs)
+    MySQL_DB.view_db(omit)
