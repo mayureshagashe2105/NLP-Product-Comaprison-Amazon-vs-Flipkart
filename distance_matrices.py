@@ -1,8 +1,15 @@
 import numpy as np
 import helperfuncs
 import MySQL_DB
+import Amazon
+import Flipkart
 
 PLACEHOLDER = '!!!'
+
+
+
+Amazon.ScrappingAmazon('KEYWORD')
+
 
 def textformat(text):
     formatter = helperfuncs.TextFormatting(text)
