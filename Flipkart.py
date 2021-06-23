@@ -3,6 +3,7 @@ import urllib.request
 import urllib.error
 import urllib
 import mysql.connector
+import streamlit as st
 
 db = mysql.connector.connect(
     host='localhost',
@@ -27,6 +28,7 @@ def ScrappingFlipkart(KEYWORD):
             price, url, Name1 = '', '', ''
             for div in divs[:10]:
                 subdiv = div.find('div', class_='_4rR01T')
+                image_url = div.find('img', class_='_396cs4 _3exPp9')['src']
                 if subdiv is None:
                     aas = div.find_all('a')
                     for a in aas:
@@ -43,8 +45,8 @@ def ScrappingFlipkart(KEYWORD):
                                 print("------------------------------")'''
                                 i += 1
                                 # print(f'{i}. ', end='')
-                                temp = (Name1, price, 'NA', url)
-                                mycursor.execute('INSERT INTO product(name, price, isprime, url) VALUES (%s, %s, %s, %s)', temp)
+                                temp = (Name1, price, 'NA', url, image_url)
+                                mycursor.execute('INSERT INTO product(name, price, isprime, url, imageurl) VALUES (%s, %s, %s, %s, %s)', temp)
                                 db.commit()
                             else:
                                 Name1 = Name
@@ -57,6 +59,7 @@ def ScrappingFlipkart(KEYWORD):
                     Des = div.find('div', class_='fMghEO')
                     Price = div.find('div', class_='_30jeq3 _1_WHN1')
                     url = f'https://www.flipkart.com{div.find("a")["href"]}'
+                    image_url = div.find('img', class_='_396cs4 _3exPp9')['src']
                     # print(f'{i}. {Name}\nDescription: ')
                     for j in Des.text.split(","):
                         # print(j)
@@ -66,10 +69,19 @@ def ScrappingFlipkart(KEYWORD):
                     print(f'URL : {url}')
                     print('------------------------------------------')'''
                     i += 1
-                    mycursor.execute('INSERT INTO product(name, price, isprime, url) VALUES (%s, %s, %s, %s)', (Name, Price.text, "NA", url))
+                    mycursor.execute('INSERT INTO product(name, price, isprime, url, imageurl) VALUES (%s, %s, %s, %s, %s)', (Name, Price.text, "NA", url, image_url))
                     db.commit()
-            print(f'Fetched {i} entries from Flipkart successfully!!!')
+            #print(f'Fetched {i} entries from Flipkart successfully!!!')
+            st.sidebar.success(f'Fetched {i} entries from Flipkart successfully!!!')
             break
         except urllib.error.HTTPError:
-            print('Trying to connect.....Please wait!!!')
+            #print('Trying to connect.....Please wait!!!')
             continue
+
+        except AttributeError:
+            st.error('Please enter valid search query, if problem persists, consider to enter detailed query')
+            break
+
+        except TypeError:
+            st.error('Please enter valid search query, if problem persists, consider to enter detailed query')
+            break
