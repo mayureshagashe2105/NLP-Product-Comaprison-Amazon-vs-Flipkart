@@ -9,8 +9,8 @@ warn = 0
 db = mysql.connector.connect(
     host='localhost',
     user='root',
-    passwd='Mihirmayuresh123!',
-    database='scrapped_db'
+    passwd='***',
+    database='______'
 )
 
 mycursor = db.cursor()

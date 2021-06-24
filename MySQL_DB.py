@@ -5,9 +5,11 @@ import streamlit as st
 db = mysql.connector.connect(
     host='localhost',
     user='root',
-    passwd='Mihirmayuresh123!',
-    database='scrapped_db'
+    passwd='***',  # Password is hidden
+    database='_______'  # Your DB
 )
+
+
 
 mycursor = db.cursor(buffered=True)
 mycursor1 = db.cursor(buffered=True)
@@ -40,18 +42,19 @@ def getflipkart(shape):
 
 
 def retrivedata(ndarray_pairs, con_dict, info, flag=False):
-    #print(len(ndarray_pairs), "ok")
+    # print(len(ndarray_pairs), "ok")
     global mycursor, mycursor1, mycursor2, mycursor3
     Q = 'SELECT * FROM product WHERE isprime != "NA"'
     Q1 = 'SELECT * FROM product WHERE isprime = "NA"'
     if not flag:
         mycursor.execute(Q)
         counter0 = 0
-        #print('\n*****Matched Results:*****\n-------------------------------')
+        # print('\n*****Matched Results:*****\n-------------------------------')
         if len(ndarray_pairs) is not 0:
             info.markdown('## **Matched Results**:')
         else:
-            info.info('Oops...seems like there weren\'t any great matches. Go to "All Products" page to see all the products seperately')
+            info.info(
+                'Oops...seems like there weren\'t any great matches. Go to "All Products" page to see all the products seperately')
         __ = 0
         _ = 0
         for x in mycursor:
@@ -80,9 +83,9 @@ def retrivedata(ndarray_pairs, con_dict, info, flag=False):
 </div>
 </body>
 </html>''', unsafe_allow_html=True)
-                    #print('*****BEST MATCH:*****')
-                    #info.write(f'{x[:]} \n{y[:]}')
-                    #info.table({'Name': [x[1], y[1]], 'Price': [x[2], y[2]], 'url': [x[4], y[4]]})
+                    # print('*****BEST MATCH:*****')
+                    # info.write(f'{x[:]} \n{y[:]}')
+                    # info.table({'Name': [x[1], y[1]], 'Price': [x[2], y[2]], 'url': [x[4], y[4]]})
                     con[1].markdown(f'''<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -101,12 +104,12 @@ def retrivedata(ndarray_pairs, con_dict, info, flag=False):
 </div>
 </body>
 </html>''', unsafe_allow_html=True)
-                    #print(_, '. ', x[1:3], '\n     ', y[1:3])
+                    # print(_, '. ', x[1:3], '\n     ', y[1:3])
                     __ += 1
-                    #print('##*RELATED MATCHES*')
+                    # print('##*RELATED MATCHES*')
                     info.markdown("<h3><centre>RELATED MATCHES</centre><h3/>", unsafe_allow_html=True)
                     retrivedata(np.array(con_dict[counter0]), {}, info, flag=True)
-                    #print('---------------------------------------------')
+                    # print('---------------------------------------------')
                     info.markdown('<hr>', unsafe_allow_html=True)
                 counter1 += 1
             counter0 += 1
@@ -119,7 +122,7 @@ def retrivedata(ndarray_pairs, con_dict, info, flag=False):
             counter3 = 0
             for y in mycursor3:
                 if [counter2, counter3] in ndarray_pairs.tolist():
-                    #print(y[1:3])
+                    # print(y[1:3])
                     info.markdown(f'''<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -145,7 +148,7 @@ def retrivedata(ndarray_pairs, con_dict, info, flag=False):
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 </body>
 </html>''',
-                                    unsafe_allow_html=True)
+                                  unsafe_allow_html=True)
                 counter3 += 1
             counter2 += 1
 
@@ -158,11 +161,11 @@ def view_db(KEYWORD, omit=False):
         st.warning("Please enter search query first!!!")
     else:
         i = 0
-        #print('*****Entries from Amazon related to search query:*****')
+        # print('*****Entries from Amazon related to search query:*****')
         mycursor1.execute('SELECT * FROM product WHERE isprime != "NA"')
         for item in mycursor1:
             i += 1
-            #print(f'{i} . {item}\n--------------------')
+            # print(f'{i} . {item}\n--------------------')
             parts[0].markdown(f'''<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -183,11 +186,11 @@ def view_db(KEYWORD, omit=False):
 </html>''', unsafe_allow_html=True)
 
         i = 0
-        #print('*****Entries from Flipkart related to search query:*****')
+        # print('*****Entries from Flipkart related to search query:*****')
         mycursor1.execute('SELECT * FROM product WHERE isprime = "NA"')
         for item in mycursor1:
             i += 1
-            #print(f'{i} . {item}\n--------------------')
+            # print(f'{i} . {item}\n--------------------')
             parts[1].markdown(f'''<!DOCTYPE html>
 <html lang="en">
 <head>
