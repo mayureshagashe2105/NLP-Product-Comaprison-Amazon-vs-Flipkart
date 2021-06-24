@@ -40,6 +40,7 @@ def getflipkart(shape):
 
 
 def retrivedata(ndarray_pairs, con_dict, info, flag=False):
+    #print(len(ndarray_pairs), "ok")
     global mycursor, mycursor1, mycursor2, mycursor3
     Q = 'SELECT * FROM product WHERE isprime != "NA"'
     Q1 = 'SELECT * FROM product WHERE isprime = "NA"'
@@ -47,7 +48,10 @@ def retrivedata(ndarray_pairs, con_dict, info, flag=False):
         mycursor.execute(Q)
         counter0 = 0
         #print('\n*****Matched Results:*****\n-------------------------------')
-        info.markdown('## **Matched Results**:')
+        if len(ndarray_pairs) is not 0:
+            info.markdown('## **Matched Results**:')
+        else:
+            info.info('Oops...seems like there weren\'t any great matches. Go to "All Products" page to see all the products seperately')
         __ = 0
         _ = 0
         for x in mycursor:
@@ -147,17 +151,19 @@ def retrivedata(ndarray_pairs, con_dict, info, flag=False):
 
 
 def view_db(KEYWORD, omit=False):
+    parts = st.beta_columns(2)
+    parts[0].title(f'Amazon Products:')
+    parts[1].title(f'Flipkart Products:')
     if KEYWORD == "":
         st.warning("Please enter search query first!!!")
     else:
         i = 0
         #print('*****Entries from Amazon related to search query:*****')
-        st.markdown(f'''<h2>Entries from Amazon related to "{KEYWORD}":</h2>''', unsafe_allow_html=True)
         mycursor1.execute('SELECT * FROM product WHERE isprime != "NA"')
         for item in mycursor1:
             i += 1
             #print(f'{i} . {item}\n--------------------')
-            st.markdown(f'''<!DOCTYPE html>
+            parts[0].markdown(f'''<!DOCTYPE html>
 <html lang="en">
 <head>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
@@ -166,11 +172,11 @@ def view_db(KEYWORD, omit=False):
 </head>
 <body>
 <div class="card" style="width: 18rem;">
-  <img src="{item[-1]}" class="card-img-top" alt="...">
+  <img src="{item[-1]}" height="350px" class="card-img-top" alt="...">
   <div class="card-body">
     <h5 class="card-title">Card title</h5>
-    <p class="card-text"><b>Name:</b><font face="Comic sans MS">{item[1]}<br><b>Price:</b> {item[2]} Rs</font></p>
-    <a href="{item[4]}" class="btn btn-primary">Go to Flipkart</a>
+    <p class="card-text"><b>Name:</b><font face="Comic sans MS">{item[1][:60]}<br><b>Price:</b> {item[2]} Rs</font></p>
+    <a href="{item[4]}" class="btn btn-primary">Go to Amazon</a>
   </div>
 </div>
 </body>
@@ -178,12 +184,11 @@ def view_db(KEYWORD, omit=False):
 
         i = 0
         #print('*****Entries from Flipkart related to search query:*****')
-        st.markdown(f'''<h2>Entries from Flipkart related to "{KEYWORD}":</h2>''', unsafe_allow_html=True)
         mycursor1.execute('SELECT * FROM product WHERE isprime = "NA"')
         for item in mycursor1:
             i += 1
             #print(f'{i} . {item}\n--------------------')
-            st.markdown(f'''<!DOCTYPE html>
+            parts[1].markdown(f'''<!DOCTYPE html>
 <html lang="en">
 <head>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
@@ -192,10 +197,10 @@ def view_db(KEYWORD, omit=False):
 </head>
 <body>
 <div class="card" style="width: 18rem;">
-  <img src="{item[-1]}" class="card-img-top" alt="...">
+  <img src="{item[-1]}" height="350px" class="card-img-top" alt="...">
   <div class="card-body">
     <h5 class="card-title">Card title</h5>
-    <p class="card-text"><b>Name:</b><font face="Comic sans MS">{item[1]}<br><b>Price:</b> {item[2]} Rs</font></p>
+    <p class="card-text"><b>Name:</b><font face="Comic sans MS">{item[1][:60]}<br><b>Price:</b> {item[2]} Rs</font></p>
     <a href="{item[4]}" class="btn btn-primary">Go to Flipkart</a>
   </div>
 </div>

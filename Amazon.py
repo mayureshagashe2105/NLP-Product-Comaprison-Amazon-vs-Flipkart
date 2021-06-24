@@ -120,8 +120,12 @@ def ScrappingAmazon(KEYWORD, include_features=False):
 
         except AttributeError:
             st.error('Please enter valid search query, if problem persists, consider to enter detailed query')
+            from distance_matrices import truncating
+            truncating()
             break
 
         except TypeError:
             st.error('Please enter valid search query, if problem persists, consider to enter detailed query')
+            from distance_matrices import truncating
+            truncating()
             break
