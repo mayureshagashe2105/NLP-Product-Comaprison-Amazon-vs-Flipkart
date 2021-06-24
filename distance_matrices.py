@@ -3,15 +3,14 @@ import helperfuncs
 import MySQL_DB
 import Amazon
 import Flipkart
-
-PLACEHOLDER = '!!!'
+import streamlit as st
 
 
 def GetData(KEYWORD, include_features=False):
     Amazon.ScrappingAmazon(KEYWORD, include_features=include_features)
     Flipkart.ScrappingFlipkart(KEYWORD)
-    print(f'\nShowing results for {KEYWORD}:')
-
+    #print(f'\nShowing results for {KEYWORD}:')
+    st.info(f'Showing results for {KEYWORD}:')
 
 
 def textformat(text):
@@ -23,7 +22,6 @@ def textformat(text):
 
 
 def distance_calc(shape):
-    global PLACEHOLDER
     amazon = MySQL_DB.getamazon(shape)
     dist_matrix = np.zeros((shape, shape))
     i = 0
@@ -52,14 +50,15 @@ def distance_calc(shape):
             dist_matrix[i] = temp_score
             i += 1
     except Exception as e:
-        print(e)
-        print(f'{shape} record(s) are not available to compare')
+        pass
+        #print(e)
+        #print(f'{shape} record(s) are not available to compare')
 
     return dist_matrix
 
 
-def compare(matrix, confidence_score=0.5, omit=False):
-    print('')
+def compare(matrix, info, confidence_score=0.5, omit=False):
+    #print('')
     sl = np.argwhere(matrix[:, :] > confidence_score)
     product_id = sl[:, 0]
     try1 = np.unique(product_id)
@@ -72,11 +71,41 @@ def compare(matrix, confidence_score=0.5, omit=False):
         if max_dict[indices[0]][0] < val:
             max_dict[indices[0]] = [val, indices[1]]
 
+    for indices in try1:
+        temp = []
+        flag = False
+        for indices1 in sl:
+            if indices == indices1[0]:
+                temp.append(indices1)
+                flag = True
+            else:
+                if not flag:
+                    continue
+                else:
+                    break
+        con_dict[indices] = temp
+
     pairs = np.ones((len(try1), 2)).astype('int32')
     i = 0
     for key, val in max_dict.items():
         pairs[i] = [key, val[1]]
         i += 1
 
-    MySQL_DB.retrivedata(pairs)
-    MySQL_DB.view_db(omit)
+    MySQL_DB.retrivedata(pairs, con_dict, info)
+
+
+def db_disconnect():
+    MySQL_DB.disconnect()
+
+
+def num_entries():
+    count = MySQL_DB.count()
+    return count
+
+
+def truncating():
+    MySQL_DB.truncate()
+
+
+def view_db(KEYWORD):
+    MySQL_DB.view_db(KEYWORD, omit=False)

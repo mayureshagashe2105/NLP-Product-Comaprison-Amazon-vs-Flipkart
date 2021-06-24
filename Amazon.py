@@ -3,7 +3,9 @@ import urllib.request
 import urllib.error
 import urllib
 import mysql.connector
-
+import streamlit as st
+i = 0
+warn = 0
 db = mysql.connector.connect(
     host='localhost',
     user='root',
@@ -20,13 +22,14 @@ mycursor = db.cursor()
 # mycursor.execute('DROP TABLE product')
 
 Q2 = 'SELECT * FROM product'
-Q3 = 'DELETE FROM product'
+Q3 = 'TRUNCATE TABLE product'
 
 mycursor.execute(Q3)
 db.commit()
 
 
 def ScrappingAmazon(KEYWORD, include_features=False):
+    global warn
     while True:
         try:
             r = urllib.request.urlopen(f"https://www.amazon.in/s?k={KEYWORD}&ref=nb_sb_noss_2")
@@ -75,6 +78,7 @@ def ScrappingAmazon(KEYWORD, include_features=False):
                     url = name.find('a')['href']
                     url = 'https://www.amazon.in' + url
                     usable_url = url.split('?')[0]  # taking only "GET" url
+                    image_url = item.find('img', class_='s-image')['src']
                     if include_features:
                         while True:
                             '''For description'''
@@ -98,14 +102,30 @@ def ScrappingAmazon(KEYWORD, include_features=False):
                     print(
                         '-----------------------------------------------------------------------------------------------')'''
                     i += 1
-                    mycursor.execute('INSERT INTO product(name, price, isprime, url) VALUES (%s, %s, %s, %s)',
-                                     (name.text, price.text.split('₹')[1], db_isprime, usable_url))
+                    mycursor.execute('INSERT INTO product(name, price, isprime, url, imageurl) VALUES (%s, %s, %s, %s, %s)',
+                                     (name.text, price.text.split('₹')[1], db_isprime, usable_url, image_url))
                     db.commit()
                 except:
                     continue
-            print(f'Fetched {i} entries from Amazon successfully!!!')
+            #print(f'Fetched {i} entries from Amazon successfully!!!')
+            st.sidebar.success(f'Fetched {i} entries from Amazon successfully!!!')
             break
 
         except urllib.error.HTTPError:
-            print('Trying to connect.....Please wait!!!')
+            #print('Trying to connect.....Please wait!!!')
+            if warn < 1:
+                st.sidebar.info('Establishing the connection.....Please wait!!!')
+            warn += 1
             continue
+
+        except AttributeError:
+            st.error('Please enter valid search query, if problem persists, consider to enter detailed query')
+            from distance_matrices import truncating
+            truncating()
+            break
+
+        except TypeError:
+            st.error('Please enter valid search query, if problem persists, consider to enter detailed query')
+            from distance_matrices import truncating
+            truncating()
+            break
