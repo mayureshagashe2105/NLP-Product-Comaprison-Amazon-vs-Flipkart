@@ -34,12 +34,12 @@ $ streamlit run UI.py
 ## Prototype Insights
 ### Best Match Page
 Here best matches with highest confidence score along with all the related search results will be shown.
-<br><img src="2021-06-29.png" alt="image"/>
+<br><img src="Images/2021-06-29.png" alt="image"/>
 <hr>
-<img src="2021-06-29 (1).png" alt="image"/>
+<img src="Images/2021-06-29 (1).png" alt="image"/>
 <hr>
-<img src="2021-06-29 (2).png" alt="image"/>
+<img src="Images/2021-06-29 (2).png" alt="image"/>
 
 ### All Products Page
-Here all products related to your search query will be shown.
-<img src="2021-06-29 (3).png" alt="image"/>
+Here all products related to your search query will be shown.<br>
+<img src="Images/2021-06-29 (3).png" alt="image"/>
