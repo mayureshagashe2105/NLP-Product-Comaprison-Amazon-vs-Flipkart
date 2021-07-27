@@ -8,8 +8,8 @@ import streamlit as st
 db = mysql.connector.connect(
     host='localhost',
     user='root',
-    passwd='***',
-    database='_____'
+    passwd='Mihirmayuresh123!',
+    database='scrapped_db'
 )
 
 mycursor = db.cursor(buffered=True)
