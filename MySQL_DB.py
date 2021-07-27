@@ -4,9 +4,9 @@ import streamlit as st
 
 db = mysql.connector.connect(
     host='localhost',
-    user='root',
-    passwd='Mihirmayuresh123!',  # Password is hidden
-    database='scrapped_db'  # Your DB
+    user=USER_NAME,
+    passwd=PASSWD,
+    database=DB_USERNAME  # Your DB
 )
 
 
